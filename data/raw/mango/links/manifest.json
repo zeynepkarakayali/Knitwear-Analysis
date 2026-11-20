@@ -1,0 +1,13 @@
+{
+  "brand": "Mango",
+  "category_url": "https://shop.mango.com/us/en/c/women/sweaters-and-cardigans/f9a8c868",
+  "started_at": "2026-10-26T14:28:33.475805+00:00",
+  "updated_at": "2026-10-26T14:29:21.853749+00:00",
+  "stop_reason": "bottom_quiet_timeout",
+  "link_count": 602,
+  "rounds": 156,
+  "blocked_resources": 1374,
+  "coverage_verified": false,
+  "error": null,
+  "sampling": "all product/colour links in the category; process_products adds colours found on product pages"
+}

@@ -1,0 +1,13 @@
+{
+  "brand": "Zara",
+  "category_url": "https://www.zara.com/us/en/woman-knitwear-l1152.html?v1=2420306",
+  "started_at": "2026-10-26T14:28:03.425914+00:00",
+  "updated_at": "2026-10-26T14:34:47.296855+00:00",
+  "stop_reason": "max_scrolls_reached_incomplete",
+  "link_count": 393,
+  "rounds": 400,
+  "blocked_resources": 738,
+  "coverage_verified": false,
+  "error": null,
+  "sampling": "all product/colour links in the category; process_products adds colours found on product pages"
+}

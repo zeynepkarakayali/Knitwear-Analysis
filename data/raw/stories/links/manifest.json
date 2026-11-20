@@ -1,0 +1,13 @@
+{
+  "brand": "& Other Stories",
+  "category_url": "https://www.stories.com/en-us/clothing/knitwear/",
+  "started_at": "2026-10-24T10:50:56.860449+00:00",
+  "updated_at": "2026-10-24T10:52:08.659285+00:00",
+  "stop_reason": "no_products_on_page",
+  "model_count": 143,
+  "rounds": 9,
+  "blocked_resources": 345,
+  "coverage_verified": false,
+  "error": null,
+  "sampling": "first_discovered_colour_variant_per_model; all category items"
+}

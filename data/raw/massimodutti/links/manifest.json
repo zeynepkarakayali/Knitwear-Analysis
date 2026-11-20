@@ -1,0 +1,13 @@
+{
+  "brand": "Massimo Dutti",
+  "category_url": "https://www.massimodutti.com/us/women/jumpers-n1464",
+  "started_at": "2026-10-26T14:30:04.115450+00:00",
+  "updated_at": "2026-10-26T14:30:56.700073+00:00",
+  "stop_reason": "bottom_quiet_timeout",
+  "link_count": 293,
+  "rounds": 74,
+  "blocked_resources": 1096,
+  "coverage_verified": false,
+  "error": null,
+  "sampling": "all product/colour links in the category; process_products adds colours found on product pages"
+}

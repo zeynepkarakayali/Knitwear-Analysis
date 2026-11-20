@@ -1,0 +1,13 @@
+{
+  "brand": "H&M",
+  "category_url": "https://www2.hm.com/en_us/women/products/cardigans-sweaters.html",
+  "started_at": "2026-10-22T15:02:07.908795+00:00",
+  "updated_at": "2026-10-22T15:04:51.671896+00:00",
+  "stop_reason": "page_without_new_models",
+  "model_count": 497,
+  "rounds": 26,
+  "blocked_resources": 1033,
+  "coverage_verified": false,
+  "error": null,
+  "sampling": "first_discovered_colour_variant_per_model; all category items"
+}

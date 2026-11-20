@@ -1,0 +1,8 @@
+# Data collection (collect_links.py, process_products.py, brand parsers)
+playwright>=1.40
+beautifulsoup4>=4.12
+# Analysis (merge_products.py itself needs only the standard library)
+pandas>=2.0
+matplotlib>=3.7
+seaborn>=0.13
+jupyter

@@ -1,0 +1,13 @@
+{
+  "brand": "COS",
+  "category_url": "https://www.cos.com/en-us/women/knitwear",
+  "started_at": "2026-10-23T19:21:05.235318+00:00",
+  "updated_at": "2026-10-23T19:22:03.420118+00:00",
+  "stop_reason": "page_without_new_models",
+  "model_count": 139,
+  "rounds": 7,
+  "blocked_resources": 679,
+  "coverage_verified": false,
+  "error": null,
+  "sampling": "first_discovered_colour_variant_per_model; all category items"
+}
