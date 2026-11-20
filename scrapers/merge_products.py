@@ -92,7 +92,12 @@ def read_brand_csv(path):
         for column in DROP:
             row.pop(column, None)
         row['brand_key'] = brand_key
-        row['source_csv'] = str(path)
+        
+        try:
+            rel = path.resolve().relative_to(common.ROOT)
+        except ValueError:
+            rel = path
+        row['source_csv'] = rel.as_posix()
     return rows
 
 
@@ -215,8 +220,8 @@ def write_csv(path, rows, columns):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('--root', type=Path, default=Path('.'), help='Project root (contains data/raw/<brand>/products)')
-    ap.add_argument('--out-dir', type=Path, default=Path('data/dataset'))
+    ap.add_argument('--root', type=Path, default=common.ROOT, help='Project root (contains data/raw/<brand>/products)')
+    ap.add_argument('--out-dir', type=Path, default=common.MERGED)
     ap.add_argument('--keep-all', action='store_true', help='Keep rows outside sweaters/cardigans too')
     args = ap.parse_args()
 

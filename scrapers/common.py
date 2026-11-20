@@ -9,6 +9,12 @@ import unicodedata
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]     # proje kökü
+RAW = ROOT / "data" / "raw"                    # data/raw/<marka>/
+MERGED = ROOT / "data" / "merged"              # models.csv, variants.csv, fibres.csv
+
 BRANDS = ('zara', 'mango', 'hm', 'shein', 'uniqlo', 'cos', 'massimodutti', 'stories', 'bershka')  # module names, selected with --brand
 CHALLENGE = ('access denied', 'captcha', 'just a moment', 'robot', 'are you a human')
 BLOCK_TEXT = ("you don't have permission to access", 'errors.edgesuite.net', 'verify you are human',
@@ -35,6 +41,12 @@ CARDIGAN = re.compile(r'\bcardigans?\b')
 OUT_OF_SCOPE = re.compile(r'\b(?:sleeveless|vests?|dress|poncho|jacket|skirt|coat|gilet)\b')
 SWEATER_SUBCATEGORIES = {'sweater', 'sweaters', 'jumper', 'jumpers', 'pullover', 'pullovers'}
 CARDIGAN_SUBCATEGORIES = {'cardigan', 'cardigans'}
+
+
+def brand_dir(brand: str) -> Path:
+    d = RAW / brand
+    d.mkdir(parents=True, exist_ok=True)
+    return d
 
 
 class Blocked(Exception):

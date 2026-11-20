@@ -20,7 +20,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 import common
 
-DATA_RAW = Path('data/raw')  # run from the project root: data/raw/<brand>/links, products, saved
+DATA_RAW = common.RAW   # run from the project root: data/raw/<brand>/links, products, saved
 
 
 def collect(page, url, brand, debug_dir=None):
