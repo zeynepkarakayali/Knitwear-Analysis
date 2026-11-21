@@ -1,0 +1,11 @@
+statistic,full data,balanced mean,balanced 2.5%,balanced 97.5%
+"Q1 price ~ brand, epsilon²",0.597,0.725,0.69,0.758
+"Q1 median price, fast fashion ($)",59.99,58.643,49.99,59.9
+"Q1 median price, mid / premium ($)",139.0,135.94,130.0,139.0
+"Q2 mean synthetic share, fast fashion (%)",61.849,63.718,60.02,67.606
+"Q2 mean synthetic share, mid / premium (%)",11.604,13.953,12.985,14.858
+"Q2 majority-synthetic models, fast fashion (%)",59.983,63.367,58.824,68.067
+"Q2 majority-synthetic models, mid / premium (%)",6.389,9.162,8.402,9.665
+"Q2 pooled rho(log price, animal share)",0.487,0.6,0.562,0.636
+Q3 named fibre < 50% of the garment (% of mentions),24.764,23.936,20.321,27.568
+"Q3 token animal fibre, fast fashion (% of models)",32.08,32.438,27.731,36.975

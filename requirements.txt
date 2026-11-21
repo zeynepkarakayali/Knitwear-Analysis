@@ -1,8 +1,14 @@
-# Data collection (collect_links.py, process_products.py, brand parsers)
-playwright>=1.40
-beautifulsoup4>=4.12
-# Analysis (merge_products.py itself needs only the standard library)
+# analysis (src/, notebooks)
 pandas>=2.0
+numpy>=1.24
+scipy>=1.10
+statsmodels>=0.14
 matplotlib>=3.7
-seaborn>=0.13
 jupyter
+
+# dashboard (dashboard/)
+streamlit>=1.50
+plotly>=5.20
+
+# scraping (scraper/)
+playwright>=1.40

@@ -14,4 +14,5 @@ data/raw/*/products/errors.jsonl
 data/test/
 data_backup_*/
 
+notebooks/01_descriptive_analysis_copy.ipynb
 notebooks/01_descriptive_analysis.ipynb
