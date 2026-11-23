@@ -36,7 +36,10 @@ LAYOUT = dict(template="simple_white", margin=dict(l=10, r=10, t=30, b=10), font
 def log_price_axis(fig, axis="x"):
     upd = dict(type="log", tickvals=PRICE_TICKS, ticktext=[f"${t}" for t in PRICE_TICKS], showgrid=True,
                gridcolor="#e1e0d9", title="regular price (USD, log scale)")
-    fig.update_xaxes(**upd) if axis == "x" else fig.update_yaxes(**upd)
+    if axis == "x":
+        fig.update_xaxes(**upd)
+    else:
+        fig.update_yaxes(**upd)
     return fig
 
 
@@ -119,7 +122,6 @@ with tabs[0]:
         "origin stated": g["origin_country_std"].apply(lambda s: f"{s.notna().mean() * 100:.0f}%"),
         "claims field": pd.Series(["yes" if b in SUST_BRANDS else "no" for b in shown], index=shown),
     }).loc[brands_in]
-
     st.dataframe(tab, width="stretch", column_config={
         "median price ($)": st.column_config.NumberColumn(format="$%.2f"),
         "synthetic (mean %)": st.column_config.ProgressColumn(format="%.0f%%", min_value=0, max_value=100),
@@ -237,6 +239,46 @@ with tabs[2]:
         fig.update_layout(**LAYOUT, height=400,
                           xaxis=dict(range=[0, 100], title="% of the brand's models"))
         st.plotly_chart(fig, width="stretch", key="chart6")
+
+    # ---- within-brand (intraclass) variation
+    st.markdown("**Variation inside brands: how different are the models of one brand?**  Box = middle 50% "
+                "of models, line = median, dots = models.")
+    box_cols = list(A.VARIATION_COLS)
+    if len(brands_in) > 1:
+        part = A.variance_partition(df, box_cols)
+        st.caption("Share of the variation that lies **within** brands (1 − η²); the rest is between brands.")
+        mc = st.columns(len(box_cols))
+        for col_, c in zip(mc, box_cols):
+            col_.metric(GROUP_NAME[c],
+                        f"{part.loc[c, 'within_share'] * 100:.0f}%",
+                        help="1 − η²: the part of the variance that lies between models of the same brand. "
+                             f"ICC = {part.loc[c, 'icc1']:.2f}.")
+    view = st.radio("Show", ["all brands in one chart", "one brand"], horizontal=True, key="box_view")
+    long = df.melt(id_vars=["brand", "product_name"], value_vars=box_cols, var_name="group", value_name="share") \
+             .dropna(subset=["share"])
+    long["group"] = long["group"].map(GROUP_NAME)
+    box_colors = {GROUP_NAME[k]: GROUP_COLOR[k] for k in box_cols}
+    if view == "one brand":
+        b_sel = st.selectbox("Brand", brands_by_price, key="box_brand")
+        long = long[long["brand"] == b_sel]
+        fig = px.box(long, x="group", y="share", color="group", points="all", color_discrete_map=box_colors,
+                     category_orders={"group": list(box_colors)}, hover_data=["product_name"])
+    else:
+        fig = px.box(long, x="brand", y="share", color="group", points="all", color_discrete_map=box_colors,
+                     category_orders={"brand": brands_by_price, "group": list(box_colors)},
+                     hover_data=["product_name"])
+        fig.update_layout(boxmode="group")
+    fig.update_traces(marker=dict(size=3, opacity=0.35), jitter=0.6, line_width=1)
+    fig.update_layout(**LAYOUT, height=460, yaxis=dict(range=[-3, 103], title="% of the garment"),
+                      xaxis_title="")
+    st.plotly_chart(fig, width="stretch", key="chart_box")
+    with st.expander("Table: spread of each fibre group inside each brand"):
+        wv = A.within_brand_variation(df, box_cols, brands_by_price)
+        wv["fibre_group"] = wv["fibre_group"].map(GROUP_NAME)
+        st.dataframe(wv.round(1), width="stretch", hide_index=True)
+    st.caption("Fibre shares pile up at 0% and 100%, so many boxes collapse to a line; the dots show where the "
+               "models really are. Brand (and segment) explains about 30% of the variation in animal and "
+               "synthetic share; the rest is between models of the same brand.")
 
 # ================================================================== 4. price and fibre
 with tabs[3]:

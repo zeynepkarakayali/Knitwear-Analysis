@@ -470,6 +470,81 @@ def name_vs_composition(m):
     return fig
 
 
+# ================================================================== within-brand (intraclass) variation
+BOX_GROUPS = list(A.VARIATION_COLS)
+
+
+def _fibre_box(ax, data, positions, color, width, rng, points=True):
+    """One box per array in `data`, with the individual models as jittered dots behind it."""
+    if points:
+        for x0, vals in zip(positions, data):
+            ax.scatter(x0 + rng.uniform(-width * 0.38, width * 0.38, len(vals)), vals, s=3.5, color=color,
+                       alpha=0.28, lw=0, zorder=1)
+    bp = ax.boxplot(data, positions=positions, widths=width, patch_artist=True, showfliers=False,
+                    medianprops=dict(color=INK, lw=1.6), whiskerprops=dict(color=INK2, lw=0.9),
+                    capprops=dict(color=INK2, lw=0.9), boxprops=dict(lw=0.9, edgecolor=INK2), zorder=2)
+    for box in bp["boxes"]:
+        box.set_facecolor(mpl.colors.to_rgba(color, 0.35))
+
+
+def fibre_boxplots_by_brand(m, brands=None, seed=0):
+    """Small multiples: one panel per brand, one box per fibre group (each dot = one model)."""
+    brands = brands or A.brands_by_price(m)
+    med = m.groupby("brand")["price_regular"].median()
+    rng = np.random.default_rng(seed)
+    fig, axes = plt.subplots(2, 4, figsize=(12, 6.4), sharey=True)
+    for ax, b in zip(axes.flat, brands):
+        g = m[m["brand"] == b]
+        data = [g[c].dropna().to_numpy() for c in BOX_GROUPS]
+        for i, (c, vals) in enumerate(zip(BOX_GROUPS, data)):
+            _fibre_box(ax, [vals], [i], GROUP_COLOR[c], 0.62, rng)
+        ax.set_xticks(range(len(BOX_GROUPS)), [GROUP_SHORT[c] for c in BOX_GROUPS], fontsize=8)
+        ax.set_ylim(-4, 104)
+        ax.grid(axis="x", visible=False)
+        ax.set_title(f"{b}", fontsize=9.5, pad=14)
+        ax.text(0, 1.015, f"{SEGMENT[b]} · n = {len(g)} · median ${med[b]:.0f}", transform=ax.transAxes,
+                fontsize=7, color=INK2, va="bottom")
+    for ax in axes[:, 0]:
+        ax.set_ylabel("% of the garment")
+    fig.suptitle("Fibre-group shares inside each brand (box = middle 50% of models, line = median, "
+                 "dots = models; brands ordered by median price)", x=0.01, ha="left", fontsize=10.5,
+                 fontweight="bold")
+    fig.tight_layout(rect=(0, 0, 1, 0.96), h_pad=2.2)
+    return fig
+
+
+def fibre_boxplots_combined(m, brands=None, seed=0):
+    """All brands in one chart: four boxes (fibre groups) per brand, plus the between/within split."""
+    brands = brands or A.brands_by_price(m)
+    part = A.variance_partition(m, BOX_GROUPS)
+    med = m.groupby("brand")["price_regular"].median()
+    rng = np.random.default_rng(seed)
+    k, w = len(BOX_GROUPS), 0.19
+    offsets = (np.arange(k) - (k - 1) / 2) * (w + 0.02)
+    fig, ax = plt.subplots(figsize=(12, 4.8))
+    for j, c in enumerate(BOX_GROUPS):
+        data = [m.loc[m["brand"] == b, c].dropna().to_numpy() for b in brands]
+        _fibre_box(ax, data, np.arange(len(brands)) + offsets[j], GROUP_COLOR[c], w, rng)
+        e = part.loc[c, "eta2_between"]
+        ax.scatter([], [], marker="s", s=60, color=mpl.colors.to_rgba(GROUP_COLOR[c], 0.6),
+                   label=f"{GROUP_SHORT[c]} ({e * 100:.0f}% between brands, {100 - e * 100:.0f}% within)")
+    for x in np.arange(len(brands) - 1) + 0.5:
+        ax.axvline(x, color="#e1e0d9", lw=0.8, zorder=0)
+    ax.set_xticks(range(len(brands)), [f"{SHORT.get(b, b)}\n${med[b]:.0f}" for b in brands])
+    for t, b in zip(ax.get_xticklabels(), brands):
+        t.set_color(SEG_COLOR[SEGMENT[b]])
+    ax.set_xlim(-0.55, len(brands) - 0.45)
+    ax.set_ylim(-4, 104)
+    ax.grid(axis="x", visible=False)
+    ax.set_ylabel("% of the garment")
+    ax.legend(loc="lower left", bbox_to_anchor=(0, 1.0), ncol=2, fontsize=8, handletextpad=0.3, columnspacing=1.5)
+    ax.set_title("Fibre-group shares by brand: most of the variation is inside brands", pad=40)
+    ax.text(0, -0.17, "Brands ordered by median price; label colour = segment (blue fast fashion, orange mid / premium). "
+            "Box = middle 50% of models, line = median, dots = models.", transform=ax.transAxes, fontsize=7.5,
+            color=INK2)
+    return fig
+
+
 # ================================================================== registry
 # file name -> (function, needs the raw colour table?)
 ALL_FIGURES = {
@@ -487,4 +562,6 @@ ALL_FIGURES = {
     "fig11_q2_fibre_price_premium": (lambda m, vr: fibre_price_premium(m), False),
     "fig12_q3_named_fibre_share": (lambda m, vr: named_fibre_share(m), False),
     "fig13_q3_name_vs_composition": (lambda m, vr: name_vs_composition(m), False),
+    "fig14_q2_fibre_boxplots_by_brand": (lambda m, vr: fibre_boxplots_by_brand(m), False),
+    "fig15_q2_fibre_boxplots_combined": (lambda m, vr: fibre_boxplots_combined(m), False),
 }

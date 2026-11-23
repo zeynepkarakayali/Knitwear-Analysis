@@ -128,6 +128,44 @@ def bin_shares(m, col, bins, brands):
     return out.loc[brands]
 
 
+# ------------------------------------------------------------------ within-brand (intraclass) variation
+VARIATION_COLS = ("animal_pct", "plant_pct", "cellulosic_pct", "synthetic_pct")
+
+
+def within_brand_variation(m, cols=VARIATION_COLS, brands=None):
+    """Spread of each fibre group inside each brand: n, mean, SD, quartiles and IQR (percentage points)."""
+    rows = []
+    for b in brands or brands_by_price(m):
+        g = m[m["brand"] == b]
+        for c in cols:
+            x = g[c].dropna()
+            q1, med, q3 = x.quantile([.25, .5, .75])
+            rows.append({"brand": b, "fibre_group": c, "n": len(x), "mean": x.mean(), "sd": x.std(),
+                         "q1": q1, "median": med, "q3": q3, "iqr": q3 - q1})
+    return pd.DataFrame(rows)
+
+
+def variance_partition(m, cols=VARIATION_COLS, group="brand"):
+    """How much of each variable's variation lies between brands and how much within them.
+    eta2 = between-brand sum of squares / total; ICC(1) from one-way ANOVA (unequal group sizes);
+    epsilon2 = Kruskal-Wallis rank version. 1 - eta2 is the within-brand share."""
+    rows = []
+    for c in cols:
+        d = m[[group, c]].dropna()
+        groups = [x[c].to_numpy() for _, x in d.groupby(group)]
+        n_i = np.array([len(x) for x in groups])
+        N, k = n_i.sum(), len(groups)
+        grand = d[c].mean()
+        ssb = sum(len(x) * (x.mean() - grand) ** 2 for x in groups)
+        ssw = sum(((x - x.mean()) ** 2).sum() for x in groups)
+        msb, msw = ssb / (k - 1), ssw / (N - k)
+        n0 = (N - (n_i ** 2).sum() / N) / (k - 1)
+        rows.append({"variable": c, "n": int(N), "eta2_between": ssb / (ssb + ssw),
+                     "within_share": ssw / (ssb + ssw), "icc1": (msb - msw) / (msb + (n0 - 1) * msw),
+                     "epsilon2_rank": kruskal_eps2(d, c, group)[2]})
+    return pd.DataFrame(rows).set_index("variable")
+
+
 # ------------------------------------------------------------------ Q3
 def named_fibre_mentions(m):
     """One row per (model, fibre named in the product name) with the share of that fibre in the garment."""
